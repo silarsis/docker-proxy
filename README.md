@@ -3,12 +3,12 @@ docker-proxy
 
 Transparent proxy for docker containers, run in a docker container
 
-# Instructions for Use
+## Instructions for Use
 
 The "run.sh" script will run the container and setup the appropriate iptables
 and ip routing rules.
 
-# Overview
+## Overview
 
 The run.sh script will fire up a docker container running squid, with
 appropriate iptables rules in place for transparent proxying. It will also
@@ -23,7 +23,7 @@ If you want to see squid in operation, you can (in another terminal) attach
 to the squid container - it is tailing the access log, so will show a record
 of requests made.
 
-# Notes
+## Notes
 
 * This script assumes you have "sudo" access to perform the iptables changes
 
