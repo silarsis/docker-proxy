@@ -67,7 +67,7 @@ run () {
   # Run at console, kill cleanly if ctrl-c is hit
   trap stop SIGINT
   echo 'Now entering wait, please hit "ctrl-c" to kill proxy and undo routing'
-  echo "'docker attach ${CID}' if you wish to view the access logs in real time"
+  echo "'docker logs -f ${CID}' if you wish to view the access logs in real time"
   docker wait ${CID}
   stop
 }
