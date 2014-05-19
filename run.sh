@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/sh
 #
 # Script to maintain ip rules on the host when starting up a transparent
 # proxy server for docker.
@@ -19,7 +19,7 @@ set -e
 start_routing () {
   # Add a new route table that routes everything marked through the new container
   grep TRANSPROXY /etc/iproute2/rt_tables >/dev/null || \
-    sudo bash -c "echo '1	TRANSPROXY' >> /etc/iproute2/rt_tables"
+    sudo sh -c "echo '1	TRANSPROXY' >> /etc/iproute2/rt_tables"
   ip rule show | grep TRANSPROXY >/dev/null || \
     sudo ip rule add from all fwmark 0x1 lookup TRANSPROXY
   sudo ip route add default via ${IPADDR} dev docker0 table TRANSPROXY
