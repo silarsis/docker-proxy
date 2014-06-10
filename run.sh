@@ -13,7 +13,7 @@ set -e
 [ -z ${RUNNING_DRUN} ] && {
   RUN_DOCKER="docker run"
   CONTAINER_NAME='proxy'
-  docker images | grep "^${CONTAINER_NAME} " >/dev/null || docker build -q --rm -t ${CONTAINER_NAME} .
+  docker images | grep "^${CONTAINER_NAME} " >/dev/null || docker build -q --rm -t ${CONTAINER_NAME} "$(dirname $0)"
 }
 
 start_routing () {
