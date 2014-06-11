@@ -27,6 +27,7 @@ if [ ! -f /etc/iproute2/rt_tables ]; then
     exit 1                                                                                               
   fi                                                                                                     
 fi  
+
 start_routing () {
   # Add a new route table that routes everything marked through the new container
   sudo mkdir -p /etc/iproute2
