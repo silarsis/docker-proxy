@@ -21,7 +21,7 @@ start_routing () {
   # workaround boot2docker issue #367                                                                                 
   # https://github.com/boot2docker/boot2docker/issues/367 
   [ -d /etc/iproute2 ] || sudo mkdir -p /etc/iproute2
-  if [ ! -f /etc/iproute2/rt_tables ]; then                                                                           
+  if [ ! -e /etc/iproute2/rt_tables ]; then                                                                           
     if [ -f /usr/local/etc/rt_tables ]; then             
       sudo ln -s /usr/local/etc/rt_tables /etc/iproute2/rt_tables
     fi
