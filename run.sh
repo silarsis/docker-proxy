@@ -18,7 +18,8 @@ set -e
 
 start_routing () {
   # Add a new route table that routes everything marked through the new container
-  grep TRANSPROXY /etc/iproute2/rt_tables >/dev/null || \
+  sudo mkdir -p /etc/iproute2
+  ([ -e /etc/iproute2/rt_tables ] && grep TRANSPROXY /etc/iproute2/rt_tables >/dev/null) || \
     sudo sh -c "echo '1	TRANSPROXY' >> /etc/iproute2/rt_tables"
   ip rule show | grep TRANSPROXY >/dev/null || \
     sudo ip rule add from all fwmark 0x1 lookup TRANSPROXY
@@ -36,7 +37,7 @@ stop_routing () {
   [ "x$IPADDR" != "x" ] && {
     ip route show table TRANSPROXY | grep default >/dev/null && \
       sudo ip route del default table TRANSPROXY
-    sudo iptables -t mangle -L PREROUTING | grep 'tcp dpt:80 MARK set 0x1' >/dev/null && \
+    sudo iptables -t mangle -L PREROUTING -n | grep 'tcp dpt:80 MARK set 0x1' >/dev/null && \
       sudo iptables -t mangle -D PREROUTING -p tcp --dport 80 \! -s ${IPADDR} -i docker0 -j MARK --set-mark 1
     sudo iptables -t nat -D POSTROUTING -o docker0 -s 172.17.0.0/16 -j ACCEPT 2>/dev/null
   }
