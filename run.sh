@@ -13,8 +13,20 @@ set -e
 [ -z ${RUNNING_DRUN} ] && {
   RUN_DOCKER="docker run"
   CONTAINER_NAME='proxy'
-  docker images | grep "^${CONTAINER_NAME} " >/dev/null || docker build -q --rm -t ${CONTAINER_NAME} .
+  docker images | grep "^${CONTAINER_NAME} " >/dev/null || docker build -q --rm -t ${CONTAINER_NAME} "$(dirname $0)"
 }
+
+# workaround boot2docker issue #367                                                                                 
+# https://github.com/boot2docker/boot2docker/issues/367                                                             
+if [ ! -f /etc/iproute2/rt_tables ]; then                                                                           
+  if [ -f /usr/local/etc/rt_tables ]; then             
+    [ -d /etc/iproute2 ] || mkdir /etc/iproute2        
+    cp /usr/local/etc/rt_tables /etc/iproute2/rt_tables
+  else                                                 
+    echo "The file '/etc/iproute2/rt_tables' is missing and therefore a transparent proxy cannot be set."
+    exit 1                                                                                               
+  fi                                                                                                     
+fi  
 
 start_routing () {
   # Add a new route table that routes everything marked through the new container
