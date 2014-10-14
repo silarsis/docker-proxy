@@ -8,6 +8,13 @@ Transparent proxy for docker containers, run in a docker container
 The "run.sh" script will run the container and setup the appropriate iptables
 and ip routing rules.
 
+NOTE: This project is _not_ designed to be run with a simple "docker run" - it
+requires the "run.sh" script to be run on the docker host, so it can adjust the
+routing rules. You will need to check this code out from
+https://github.com/silarsis/docker-proxy/
+and run the "run.sh" script on the host (for OS X, that's on your boot2docker or
+similar host).
+
 ## Overview
 
 The run.sh script will fire up a docker container running squid, with
