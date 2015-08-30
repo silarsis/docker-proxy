@@ -1,7 +1,7 @@
 docker-proxy
 ============
 
-Transparent proxy for docker containers, run in a docker container
+Transparent proxy for docker containers, run in a docker container - https://hub.docker.com/r/silarsis/docker-proxy/
 
 ## Instructions for Use
 
