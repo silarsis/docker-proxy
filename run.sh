@@ -24,6 +24,8 @@ start_routing () {
   if [ ! -e /etc/iproute2/rt_tables ]; then
     if [ -f /usr/local/etc/rt_tables ]; then
       sudo ln -s /usr/local/etc/rt_tables /etc/iproute2/rt_tables
+    elif [ -f /usr/local/etc/iproute2/rt_tables ]; then
+      sudo ln -s /usr/local/etc/iproute2/rt_tables /etc/iproute2/rt_tables
     fi
   fi
   ([ -e /etc/iproute2/rt_tables ] && grep TRANSPROXY /etc/iproute2/rt_tables >/dev/null) || \
