@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/sh
 #
 # Script to maintain ip rules on the host when starting up a transparent
 # proxy server for docker.
