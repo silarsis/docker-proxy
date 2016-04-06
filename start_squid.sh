@@ -8,6 +8,9 @@ function gen-cert() {
     chown proxy.proxy privkey.pem
     chmod 600 privkey.pem
     openssl x509 -in ca.pem -outform DER -out ca.der
+    # Make CA certificate available for download via HTTP Forwarding port
+    # e.g. GET http://docker-proxy:3128/squid-internal-static/icons/ca.pem
+    cp `pwd`/ca.* /usr/share/squid3/icons/
     popd
     return $?
 }

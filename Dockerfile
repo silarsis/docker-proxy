@@ -32,13 +32,15 @@ RUN cd squid3-3.?.? \
     && patch -p1 < /root/squid3.patch \
     && export NUM_PROCS=`grep -c ^processor /proc/cpuinfo` \
     && (dpkg-buildpackage -b -j${NUM_PROCS} || dpkg-buildpackage -b -j${NUM_PROCS})
+COPY mime.conf /root/
 RUN dpkg -i \
         squid3-common_3.?.?-?ubuntu?.?_all.deb \
         squid3_3.?.?-?ubuntu?.?_*.deb \
-    && mkdir -p /etc/squid3/ssl_cert
+    && mkdir -p /etc/squid3/ssl_cert \
+    && cat mime.conf >> /usr/share/squid3/mime.conf
 
-ADD squid.conf /etc/squid3/squid.conf
-ADD start_squid.sh /usr/local/bin/start_squid.sh
+COPY squid.conf /etc/squid3/squid.conf
+COPY start_squid.sh /usr/local/bin/start_squid.sh
 
 VOLUME /var/spool/squid3
 EXPOSE 3128 3129 3130
