@@ -38,22 +38,25 @@ start_routing () {
 }
 
 stop_routing () {
-  # Remove the appropriate rules - that is, those that mention the IP Address.
-  set +e
-  [ "x$IPADDR" != "x" ] && {
+    # Remove iptables rules.
+    set +e
     ip route show table TRANSPROXY | grep -q default \
-      && sudo ip route del default table TRANSPROXY
-    sudo iptables -t mangle -L PREROUTING -n | grep -q 'tcp dpt:80 MARK set 0x1' \
-      && sudo iptables -t mangle -D PREROUTING -p tcp --dport 80 \! -s "${IPADDR}" -i docker0 -j MARK --set-mark 1 \
-      && sudo iptables -t mangle -D PREROUTING -p tcp --dport 443 \! -s "${IPADDR}" -i docker0 -j MARK --set-mark 1 \
+        && sudo ip route del default table TRANSPROXY
+    while true; do
+        rule_num=$(sudo iptables -t mangle -L PREROUTING -n --line-numbers \
+            | grep -E 'MARK.*172\.17.*tcp \S+ MARK set 0x1' \
+            | awk '{print $1}' \
+            | head -n1)
+        [ -z "$rule_num" ] && break
+        sudo iptables -t mangle -D PREROUTING "$rule_num"
+    done
     sudo iptables -t nat -D POSTROUTING -o docker0 -s 172.17.0.0/16 -j ACCEPT 2>/dev/null
-  }
-  set -e
+    set -e
 }
 
 stop () {
   set +e
-  sudo docker rm -f ${CONTAINER_NAME} >/dev/null 2>&1
+  sudo docker rm -fv ${CONTAINER_NAME} >/dev/null 2>&1
   set -e
   stop_routing
 }
