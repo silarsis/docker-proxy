@@ -81,8 +81,13 @@ run () {
   mkdir -p "${CACHEDIR}"
   # Because we're named, make sure the container doesn't already exist
   stop
-  # Run and find the IP for the running container
-  CID=$(sudo docker run --privileged -d -v "${CACHEDIR}":/var/spool/squid3 --name ${CONTAINER_NAME} ${CONTAINER_NAME})
+  # Run and find the IP for the running container. Bind the forward proxy port
+  # so clients can get the CA certificate.
+  CID=$(sudo docker run --privileged -d \
+        --name ${CONTAINER_NAME} \
+        --volume="${CACHEDIR}":/var/spool/squid3 \
+        --publish=3128:3128 \
+        ${CONTAINER_NAME})
   IPADDR=$(sudo docker inspect --format '{{ .NetworkSettings.IPAddress }}' ${CID})
   start_routing
   # Run at console, kill cleanly if ctrl-c is hit
