@@ -41,6 +41,6 @@ ADD squid.conf /etc/squid3/squid.conf
 ADD start_squid.sh /usr/local/bin/start_squid.sh
 
 VOLUME /var/spool/squid3
-EXPOSE 3128 3129
+EXPOSE 3128 3129 3130
 
 CMD ["/usr/local/bin/start_squid.sh"]
