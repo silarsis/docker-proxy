@@ -62,7 +62,8 @@ fail until you install the root certificate. To install it:
 
 Those steps can be performed in a running container (for testing), or you can
 add them to your `Dockerfile`. `detect-proxy.sh` can be run after you install
-your OS packages with apt, because apt shouldn't need HTTPS. See
+your OS packages with apt, because apt shouldn't need HTTPS. However, adding
+PPAs with `add-apt-repository` will fail until the certificate is installed. See
 [`test/Dockerfile`] for an example.
 
 [SSL Bump]: http://wiki.squid-cache.org/Features/SslBump
