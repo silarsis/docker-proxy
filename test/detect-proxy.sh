@@ -1,6 +1,8 @@
 #!/bin/bash
 
 function download-cert() {
+    # The proxy server hosts the root certificate over HTTP, on a port that is
+    # published on the host.
     AWK_SPLIT='
         !fout && /^\r?$/ { fout="docker-proxy.pem"; next }
         fout { print > fout }
