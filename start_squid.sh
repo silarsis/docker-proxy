@@ -1,17 +1,22 @@
 #!/bin/bash
 
 function gen-cert() {
-    pushd /etc/squid3/ssl_cert
-    openssl req -new -newkey rsa:2048 -sha256 -days 365 -nodes -x509 \
-        -keyout privkey.pem -out ca.pem \
-        -subj '/CN=squid-ssl/O=NULL/C=AU'
-    chown proxy.proxy privkey.pem
-    chmod 600 privkey.pem
-    openssl x509 -in ca.pem -outform DER -out ca.der
+    pushd /etc/squid3/ssl_cert > /dev/null
+    if [ ! -f ca.pem ]; then
+        openssl req -new -newkey rsa:2048 -sha256 -days 365 -nodes \
+            -x509 -keyout privkey.pem -out ca.pem \
+            -subj '/CN=docker-proxy/O=NULL/C=AU'
+        chown proxy.proxy privkey.pem
+        chmod 600 privkey.pem
+        openssl x509 -in ca.pem -outform DER -out ca.der
+    else
+        echo "Reusing existing certificate"
+    fi
+    openssl x509 -sha1 -in ca.pem -noout -fingerprint
     # Make CA certificate available for download via HTTP Forwarding port
     # e.g. GET http://docker-proxy:3128/squid-internal-static/icons/ca.pem
     cp `pwd`/ca.* /usr/share/squid3/icons/
-    popd
+    popd > /dev/null
     return $?
 }
 

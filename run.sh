@@ -4,6 +4,7 @@
 # proxy server for docker.
 
 CACHEDIR=${CACHEDIR:-/tmp/squid3}
+CERTDIR=${CACHEDIR:-/tmp/squid3_cert}
 CONTAINER_NAME=${CONTAINER_NAME:-docker-proxy}
 
 set -e
@@ -30,8 +31,10 @@ start_routing () {
   sudo ip route add default via "${IPADDR}" dev docker0 table TRANSPROXY
   # Mark packets to port 80 and 443 external, so they route through the new
   # route table
-  sudo iptables -t mangle -I PREROUTING -p tcp --dport 80 \! -s "${IPADDR}" -i docker0 -j MARK --set-mark 1
-  sudo iptables -t mangle -I PREROUTING -p tcp --dport 443 \! -s "${IPADDR}" -i docker0 -j MARK --set-mark 1
+  COMMON_RULES="-t mangle -I PREROUTING -p tcp -i docker0 ! -s ${IPADDR}
+    -j MARK --set-mark 1"
+  sudo iptables $COMMON_RULES --dport 80
+  sudo iptables $COMMON_RULES --dport 443
   # Exemption rule to stop docker from masquerading traffic routed to the
   # transparent proxy
   sudo iptables -t nat -I POSTROUTING -o docker0 -s 172.17.0.0/16 -j ACCEPT
@@ -78,7 +81,7 @@ terminated () {
 run () {
   # Make sure we have a cache dir - if you're running in vbox you should
   # probably map this through to the host machine for persistence
-  mkdir -p "${CACHEDIR}"
+  mkdir -p "${CACHEDIR}" "${CERTDIR}"
   # Because we're named, make sure the container doesn't already exist
   stop
   # Run and find the IP for the running container. Bind the forward proxy port
@@ -86,6 +89,7 @@ run () {
   CID=$(sudo docker run --privileged -d \
         --name ${CONTAINER_NAME} \
         --volume="${CACHEDIR}":/var/spool/squid3 \
+        --volume="${CERTDIR}":/etc/squid3/ssl_cert \
         --publish=3128:3128 \
         ${CONTAINER_NAME})
   IPADDR=$(sudo docker inspect --format '{{ .NetworkSettings.IPAddress }}' ${CID})
