@@ -2,15 +2,18 @@ FROM ubuntu:14.04
 
 MAINTAINER Alex Fraser <alex@vpac-innovations.com.au>
 
-# Run a caching proxy on the host and bind a port to APT_PROXY_PORT to cache
-# apt requests. Build with `docker build --build-arg APT_PROXY_PORT=[X] [...]`.
+# Install ca-certificates so we can install the proxy's certificate. curl is
+# only needed for running the test, not for installing the certificate.
 WORKDIR /root
-COPY detect-proxy.sh /root/
 RUN export DEBIAN_FRONTEND=noninteractive TERM=linux \
     && apt-get update \
     && apt-get install -y --no-install-recommends \
         ca-certificates \
         curl \
-    && ./detect-proxy.sh start
+    && rm -rf /var/lib/apt/lists/*
 
-CMD curl -O https://httpbin.org/get
+# Install the proxy's CA certificate.
+COPY detect-proxy.sh test-proxy.sh /root/
+RUN ./detect-proxy.sh start
+
+CMD /root/test-proxy.sh
