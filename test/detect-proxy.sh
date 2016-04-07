@@ -28,5 +28,6 @@ fi
 
 echo "SSL-caching proxy server detected. Installing certificate."
 
+# Install CA cert into OS key store
 cp docker-proxy.pem /usr/local/share/ca-certificates/docker-proxy.crt
 update-ca-certificates
