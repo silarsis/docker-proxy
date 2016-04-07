@@ -1,7 +1,8 @@
-docker-proxy
-============
+# docker-proxy
 
-Transparent proxy for docker containers, run in a docker container - https://hub.docker.com/r/silarsis/docker-proxy/
+Transparent caching proxy server for docker containers, run in a docker
+container. It can speed up the dependency-fetching part of your application
+build process.
 
 ## Instructions for Use
 
@@ -22,8 +23,7 @@ and ip routing rules.
 
 NOTE: This project is _not_ designed to be run with a simple `docker run` - it
 requires the `run.sh` script to be run on the docker host, so it can adjust the
-routing rules. You will need to check this code out from
-https://github.com/silarsis/docker-proxy/
+routing rules. You will need to check this code out
 and run the `run.sh` script on the host (for OS X, that's on your boot2docker or
 similar host).
 
