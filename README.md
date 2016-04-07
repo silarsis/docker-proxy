@@ -55,9 +55,15 @@ enable it, start with:
 
 The server will decrypt traffic from the server and encrypt it again using its
 own root certificate. HTTPS connections from your other Docker containers will
-fail until you install the root certificate. You can install it by running the
-[`detect-proxy.sh`] script in your container or in your project's
-`Dockerfile`. See [`test/Dockerfile`] for an example.
+fail until you install the root certificate. To install it:
+
+ 1. Install the `ca-certificates` package (Debian/Ubuntu images)
+ 2. Run [`detect-proxy.sh`]
+
+Those steps can be performed in a running container (for testing), or you can
+add them to your `Dockerfile`. `detect-proxy.sh` can be run after you install
+your OS packages with apt, because apt shouldn't need HTTPS. See
+[`test/Dockerfile`] for an example.
 
 [SSL Bump]: http://wiki.squid-cache.org/Features/SslBump
 [`detect-proxy.sh`]: test/detect-proxy.sh
