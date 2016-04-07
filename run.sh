@@ -6,6 +6,11 @@
 CACHEDIR=${CACHEDIR:-/tmp/squid3}
 CERTDIR=${CACHEDIR:-/tmp/squid3_cert}
 CONTAINER_NAME=${CONTAINER_NAME:-docker-proxy}
+if [ "$1" = 'ssl' ]; then
+    WITH_SSL=yes
+else
+    WITH_SSL=no
+fi
 
 set -e
 
@@ -33,8 +38,15 @@ start_routing () {
   # route table
   COMMON_RULES="-t mangle -I PREROUTING -p tcp -i docker0 ! -s ${IPADDR}
     -j MARK --set-mark 1"
+  echo "Redirecting HTTP to docker-proxy"
   sudo iptables $COMMON_RULES --dport 80
-  sudo iptables $COMMON_RULES --dport 443
+  if [ "$WITH_SSL" = 'yes' ]; then
+      echo "Redirecting HTTPS to docker-proxy"
+      sudo iptables $COMMON_RULES --dport 443
+  else
+      echo "Not redirecting HTTPS. To enable, re-run with the argument 'ssl'"
+      echo "CA certificate will be generated anyway, but it won't be used"
+  fi
   # Exemption rule to stop docker from masquerading traffic routed to the
   # transparent proxy
   sudo iptables -t nat -I POSTROUTING -o docker0 -s 172.17.0.0/16 -j ACCEPT

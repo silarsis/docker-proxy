@@ -10,6 +10,8 @@ if [ $? -ne 0 ]; then
     exit 1
 fi
 
+# Test with Java too, because it may get its certificates from a different key
+# store.
 java HttpTest https://httpbin.org/get || exit 1
 
 echo "All tests passed"
