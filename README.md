@@ -66,6 +66,15 @@ your OS packages with apt, because apt shouldn't need HTTPS. However, adding
 PPAs with `add-apt-repository` will fail until the certificate is installed. See
 [`test/Dockerfile`] for an example.
 
+To test HTTPS support, do this in another console after starting the proxy:
+
+```
+cd test
+sudo docker build -t test-proxy .
+sudo docker run --rm test-proxy
+# Should print "All tests passed"
+```
+
 [SSL Bump]: http://wiki.squid-cache.org/Features/SslBump
 [`detect-proxy.sh`]: test/detect-proxy.sh
 [`test/Dockerfile`]: test/Dockerfile
