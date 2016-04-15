@@ -18,6 +18,13 @@ Then run with:
 ./run.sh
 ```
 
+For Max(OSX):
+```
+docker-machine scp ./run.sh default:/home/docker/run.sh
+docker-machine ssh default
+sh ./run.sh
+```
+
 The "run.sh" script will run the container and setup the appropriate iptables
 and ip routing rules.
 
