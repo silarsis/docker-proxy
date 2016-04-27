@@ -1,17 +1,11 @@
 FROM ubuntu:14.04
 
-MAINTAINER Alex Fraser <alex@vpac-innovations.com.au>
+MAINTAINER Kevin Littlejohn <kevin@littlejohn.id.au>, \
+    Alex Fraser <alex@vpac-innovations.com.au>
 
 # Install base dependencies.
-# Run a caching proxy on the host and bind a port to APT_PROXY_PORT to cache
-# apt requests. Build with `docker build --build-arg APT_PROXY_PORT=[X] [...]`.
-# Not required if you're using a transparent proxy (like the one built by
-# this project).
 WORKDIR /root
-ARG APT_PROXY_PORT=
-COPY detect-apt-proxy.sh /root/
 RUN export DEBIAN_FRONTEND=noninteractive TERM=linux \
-    && ./detect-apt-proxy.sh ${APT_PROXY_PORT} no \
     && apt-get update \
     && apt-get install -y --no-install-recommends \
         build-essential \
@@ -24,8 +18,6 @@ RUN export DEBIAN_FRONTEND=noninteractive TERM=linux \
         ssl-cert \
     && apt-get source -y squid3 squid-langpack \
     && apt-get build-dep -y squid3 squid-langpack
-#    rm -rf /var/lib/apt/lists/* \
-#        /etc/apt/apt.conf.d/30proxy \
 
 # Customise and build Squid.
 # It's silly, but run dpkg-buildpackage again if it fails the first time. This
