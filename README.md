@@ -1,39 +1,104 @@
-docker-proxy
-============
+# docker-proxy
 
-Transparent proxy for docker containers, run in a docker container - https://hub.docker.com/r/silarsis/docker-proxy/
+Transparent caching proxy server for Docker containers, run in a Docker
+container. It can speed up the dependency-fetching part of your application
+build process.
 
 ## Instructions for Use
 
-The "run.sh" script will run the container and setup the appropriate iptables
-and ip routing rules.
+First check out the code. Then build with:
 
-NOTE: This project is _not_ designed to be run with a simple "docker run" - it
-requires the "run.sh" script to be run on the docker host, so it can adjust the
-routing rules. You will need to check this code out from
-https://github.com/silarsis/docker-proxy/
-and run the "run.sh" script on the host (for OS X, that's on your boot2docker or
-similar host).
+```
+sudo docker build -t docker-proxy .
+```
+
+Then run with:
+
+```
+./run.sh
+```
+
+The script will start the container and set up the appropriate
+routing rules. Your other Docker containers will automatically use
+the proxy, whether or not they were already running. When you are finished,
+just press <kbd>Ctrl</kbd><kbd>C</kbd> to stop the proxy.
+
+NOTE: This project is _not_ designed to be run with a simple `docker run` - it
+requires `run.sh` to be run on the docker host, so it can adjust the
+routing rules. You will need to check this code out
+and run `run.sh` on the host. For OS X, that's on your [boot2docker],
+Docker Machine or similar host). To start under [Docker Machine] on OS X:
+
+```
+docker-machine scp run.sh default:/home/docker/run.sh
+docker-machine ssh default
+sh ./run.sh
+```
+
+[boot2docker]: http://boot2docker.io/
+[Docker Machine]: https://docs.docker.com/machine/get-started/
 
 ## Overview
 
-The run.sh script will fire up a docker container running squid, with
-appropriate iptables rules in place for transparent proxying. It will also
+`run.sh` will fire up a Docker container running Squid, with
+appropriate firewall rules in place for transparent proxying. It will also
 configure port-based routing on the main host such that any traffic from a
-docker container to port 80 routes via the transparent proxy container.
+Docker container to port 80 routes via the transparent proxy container. It
+requires `sudo` access to perform the firewall changes, and it will prompt you
+for your password as appropriate.
 
-The run.sh script is designed to run in the foreground, because when the
+`run.sh` is designed to run in the foreground, because when the
 container terminates it needs to remove the rules that were redirecting the
 traffic.
 
-If you want to see squid in operation, you can (in another terminal) attach
-to the squid container - it is tailing the access log, so will show a record
-of requests made.
+If you want to see Squid in operation, you can (in another terminal) attach
+to the `docker-proxy` container - it is tailing the access log, so will show a
+record of requests made.
+
+## HTTPS Support
+
+The proxy server supports HTTPS caching via Squid's [SSL Bump] feature. To
+enable it, start with:
+
+```
+./run.sh ssl
+```
+
+The server will decrypt traffic from the server and encrypt it again using its
+own root certificate. HTTPS connections from your other Docker containers will
+fail until you install the root certificate. To install it:
+
+ 1. Install the `ca-certificates` package (Debian/Ubuntu images)
+ 2. Run [`detect-proxy.sh`]
+
+Those steps can be performed in a running container (for testing), or you can
+add them to your `Dockerfile`. `detect-proxy.sh` can be run after you install
+your OS packages with apt, because apt shouldn't need HTTPS. However, adding
+PPAs with `add-apt-repository` will fail until the certificate is installed. See
+[`test/Dockerfile`] for an example.
+
+Some programs don't use the OS's primary key store, such as `npm` and `pip`.
+You may need to take extra steps for those programs.
+
+To test HTTPS support, do this in another console after starting the proxy:
+
+```
+cd test
+sudo docker build -t test-proxy .
+sudo docker run --rm test-proxy
+# Should print "All tests passed"
+```
+
+[SSL Bump]: http://wiki.squid-cache.org/Features/SslBump
+[`detect-proxy.sh`]: test/detect-proxy.sh
+[`test/Dockerfile`]: test/Dockerfile
 
 ## Notes
 
-* This script assumes you have "sudo" access to perform the iptables changes
+This proxy configuration is intended to be used solely to speed
+up development of Docker applications. **Do not** attempt to use this to
+eavesdrop on other people's connections.
 
-* the format of the run.sh script is a bit strange - that's because it's also used as part of a larger framework on my own machine.
-
-* There exists a real possibility this script will break your iptables or ip rules in some unexpected way. I've tried to be reasonably tidy and careful, but be aware that if things go wrong, the potential exists for all containers to lose the ability to download anything.
+There exists a real possibility this script will break your `iptables` or `ip`
+rules in some unexpected way. Be aware that if things go wrong, the potential
+exists for all containers to lose the ability to download anything.

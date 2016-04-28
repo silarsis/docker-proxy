@@ -1,0 +1,13 @@
+--- a/debian/rules       2014-02-18 03:13:28.000000000 +0000
++++ b/debian/rules       2016-04-04 02:03:23.732296279 +0000
+@@ -41,8 +41,10 @@
+		--enable-icmp \
+		--enable-zph-qos \
+		--enable-ecap \
++		--enable-ssl \
+		--disable-translation \
+		--with-swapdir=/var/spool/squid3 \
++		--with-open-ssl=/etc/ssl/openssl.cnf \
+		--with-logdir=/var/log/squid3 \
+		--with-pidfile=/var/run/squid3.pid \
+		--with-filedescriptors=65536 \
