@@ -3,8 +3,8 @@
 # Script to maintain ip rules on the host when starting up a transparent
 # proxy server for docker.
 
-CACHEDIR=${CACHEDIR:-/tmp/squid3}
-CERTDIR=${CACHEDIR:-/tmp/squid3_cert}
+CACHEDIR=${CACHEDIR:-/var/lib/docker-proxy/cache}
+CERTDIR=${CERTDIR:-/var/lib/docker-proxy/ssl}
 CONTAINER_NAME=${CONTAINER_NAME:-docker-proxy}
 if [ "$1" = 'ssl' ]; then
     WITH_SSL=yes
