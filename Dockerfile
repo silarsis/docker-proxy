@@ -5,6 +5,7 @@ MAINTAINER Kevin Littlejohn <kevin@littlejohn.id.au>, \
 
 # Install base dependencies.
 WORKDIR /root
+RUN sed -i 's/^# deb-src/deb-src/' /etc/apt/sources.list
 RUN export DEBIAN_FRONTEND=noninteractive TERM=linux \
     && apt-get update \
     && apt-get install -y --no-install-recommends \
