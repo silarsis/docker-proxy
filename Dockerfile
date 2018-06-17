@@ -25,14 +25,14 @@ RUN export DEBIAN_FRONTEND=noninteractive TERM=linux \
 # is needed because sometimes the `configure` script is busy when building in
 # Docker after autoconf sets its mode +x.
 COPY squid3.patch mime.conf /root/
-RUN cd squid3-3.?.? \
+RUN cd squid3-3.* \
     && patch -p1 < /root/squid3.patch \
     && export NUM_PROCS=`grep -c ^processor /proc/cpuinfo` \
     && (dpkg-buildpackage -b -j${NUM_PROCS} \
         || dpkg-buildpackage -b -j${NUM_PROCS}) \
     && DEBIAN_FRONTEND=noninteractive TERM=linux dpkg -i \
-        ../squid3-common_3.?.?-?ubuntu?.?_all.deb \
-        ../squid3_3.?.?-?ubuntu?.?_*.deb \
+        ../squid3-common_3.*_all.deb \
+        ../squid3_3.*.deb \
     && mkdir -p /etc/squid3/ssl_cert \
     && cat /root/mime.conf >> /usr/share/squid3/mime.conf
 
