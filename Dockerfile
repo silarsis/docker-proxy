@@ -1,4 +1,4 @@
-FROM ubuntu:14.04
+FROM ubuntu:trusty-20190515
 
 MAINTAINER Kevin Littlejohn <kevin@littlejohn.id.au>, \
     Alex Fraser <alex@vpac-innovations.com.au>
