@@ -1,4 +1,4 @@
-FROM ubuntu:14.04
+FROM ubuntu:questing-20251007
 
 MAINTAINER Alex Fraser <alex@vpac-innovations.com.au>
 
