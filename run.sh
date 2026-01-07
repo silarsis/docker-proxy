@@ -36,13 +36,15 @@ start_routing () {
   sudo ip route add default via "${IPADDR}" dev docker0 table TRANSPROXY
   # Mark packets to port 80 and 443 external, so they route through the new
   # route table
-  COMMON_RULES="-t mangle -I PREROUTING -p tcp -i docker0 ! -s ${IPADDR}
-    -j MARK --set-mark 1"
+  COMMON_RULES=(
+    -t mangle -I PREROUTING -p tcp -i docker0 ! -s "${IPADDR}"
+    -j MARK --set-mark 1
+  )
   echo "Redirecting HTTP to docker-proxy"
-  sudo iptables $COMMON_RULES --dport 80
+  sudo iptables "${COMMON_RULES[@]}" --dport 80
   if [ "$WITH_SSL" = 'yes' ]; then
       echo "Redirecting HTTPS to docker-proxy"
-      sudo iptables $COMMON_RULES --dport 443
+      sudo iptables "${COMMON_RULES[@]}" --dport 443
   else
       echo "Not redirecting HTTPS. To enable, re-run with the argument 'ssl'"
       echo "CA certificate will be generated anyway, but it won't be used"
@@ -71,7 +73,7 @@ stop_routing () {
 
 stop () {
   set +e
-  sudo docker rm -fv ${CONTAINER_NAME} >/dev/null 2>&1
+  sudo docker rm -fv "${CONTAINER_NAME}" >/dev/null 2>&1
   set -e
   stop_routing
 }
@@ -99,12 +101,12 @@ run () {
   # Run and find the IP for the running container. Bind the forward proxy port
   # so clients can get the CA certificate.
   CID=$(sudo docker run --privileged -d \
-        --name ${CONTAINER_NAME} \
+        --name "${CONTAINER_NAME}" \
         --volume="${CACHEDIR}":/var/spool/squid3 \
         --volume="${CERTDIR}":/etc/squid3/ssl_cert \
         --publish=3128:3128 \
-        ${CONTAINER_NAME})
-  IPADDR=$(sudo docker inspect --format '{{ .NetworkSettings.IPAddress }}' ${CID})
+        "${CONTAINER_NAME}")
+  IPADDR=$(sudo docker inspect --format '{{ .NetworkSettings.IPAddress }}' "${CID}")
   start_routing
   # Run at console, kill cleanly if ctrl-c is hit
   trap interrupted INT

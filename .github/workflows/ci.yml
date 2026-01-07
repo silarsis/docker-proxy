@@ -1,0 +1,31 @@
+name: CI
+
+on:
+  push:
+    branches: ["**"]
+  pull_request:
+
+jobs:
+  lint-and-test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install lint tools
+        run: ./test/install-tools.sh
+
+      - name: Validate script syntax
+        run: ./test/validate-scripts.sh
+
+      - name: ShellCheck
+        run: shellcheck run.sh start_squid.sh test/detect-proxy.sh test/test-proxy.sh test/validate-scripts.sh
+
+      - name: Hadolint
+        run: hadolint Dockerfile test/Dockerfile
+
+      - name: Build proxy image
+        run: docker build -t docker-proxy .
+
+      - name: Build test image
+        run: docker build -t docker-proxy-test ./test
