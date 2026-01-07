@@ -16,14 +16,12 @@ function download-cert() {
         | grep -q 'Server: squid'
 }
 
-download-cert
-if [ $? -ne 0 ]; then
+if ! download-cert; then
     echo "No proxy server detected"
     exit 0
 fi
 
-grep -q '\-----BEGIN CERTIFICATE-----' docker-proxy.pem
-if [ $? -ne 0 ]; then
+if ! grep -q '\-----BEGIN CERTIFICATE-----' docker-proxy.pem; then
     echo "Proxy detected"
     exit 0
 fi
